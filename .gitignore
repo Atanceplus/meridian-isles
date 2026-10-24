@@ -1,0 +1,31 @@
+# Dependencies and build output
+node_modules
+dist
+coverage
+*.tsbuildinfo
+.vite
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+.claude/settings.local.json
+
+# Personal data: backups and starter maps exported from the app
+*.meridian-save.json
+*.meridian-starter.json
+
+# Generated art previews (npm run art:sheet)
+contact-sheet*.png
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS and editor clutter
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea
