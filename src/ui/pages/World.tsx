@@ -1,8 +1,8 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
-import { todayLocal } from "../../records/clock";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { LAYOUT, WORLD, ISLAND_IDS } from "../../world/art/islands";
-import { HQ_TIER_NAMES, RESTORATION_NAMES, buildWorldState, restoredSince } from "../../world/restoration";
-import { useApp, useView } from "../app/context";
+import { HQ_TIER_NAMES, restoredSince } from "../../world/restoration";
+import { useApp } from "../app/context";
+import { levelName, restorationHint, useWorld } from "../app/world";
 import { href } from "../routes";
 
 const WorldMap = lazy(() => import("../../world/WorldMap"));
@@ -24,8 +24,7 @@ const LABEL_OFFSET: Record<string, [number, number]> = {
 /** The world map: every island at its restoration level, one click from its page. */
 export function World() {
   const { registry, currentId } = useApp();
-  const { bundle, state, ruleset } = useView();
-  const world = useMemo(() => buildWorldState(bundle, state, registry, ruleset, todayLocal()), [bundle, state, registry, ruleset]);
+  const world = useWorld();
   const [hovered, setHovered] = useState<string | null>(null);
   const [motion, setMotion] = useState<Motion>(() => (read(MOTION_KEY) as Motion | null) ?? "system");
   const systemReduced = usePrefersReducedMotion();
@@ -43,13 +42,13 @@ export function World() {
     window.location.hash = islandId === ISLAND_IDS.hq ? href({ page: "hq" }) : href({ page: "islands", islandId });
   };
   const name = (id: string) => registry.islandById[id]?.name ?? id;
-  const levelName = (id: string) => (id === ISLAND_IDS.hq ? HQ_TIER_NAMES[world.hqTier] : RESTORATION_NAMES[world.islands[id]?.level ?? 0]);
+  const stateName = (id: string) => levelName(id, registry, world);
 
   return (
     <div className="page world">
       {restored.length > 0 && (
         <div className="callout good restored" role="status">
-          Restored since your last visit: {restored.map((r) => `${name(r.islandId)} → ${levelName(r.islandId)}`).join(" · ")}
+          Restored since your last visit: {restored.map((r) => `${name(r.islandId)} → ${stateName(r.islandId)}`).join(" · ")}
         </div>
       )}
       <div className="world-frame" style={{ aspectRatio: `${WORLD.w} / ${WORLD.h}` }}>
@@ -71,7 +70,7 @@ export function World() {
               onBlur={() => setHovered(null)}
             >
               <strong>{name(id)}</strong>
-              <span>{levelName(id)}</span>
+              <span>{stateName(id)}</span>
             </a>
           );
         })}
@@ -105,31 +104,14 @@ export function World() {
           return (
             <li key={id}>
               <a href={id === ISLAND_IDS.hq ? href({ page: "hq" }) : href({ page: "islands", islandId: id })}>{name(id)}</a>
-              <span className={`badge lvl-${r?.level ?? 0}`}>{levelName(id)}</span>
-              <span className="muted small">{hint(id, registry, world)}</span>
+              <span className={`badge lvl-${r?.level ?? 0}`}>{stateName(id)}</span>
+              <span className="muted small">{restorationHint(id, registry, world)}</span>
             </li>
           );
         })}
       </ul>
     </div>
   );
-}
-
-function hint(id: string, registry: ReturnType<typeof useApp>["registry"], world: ReturnType<typeof buildWorldState>): string {
-  const island = registry.islandById[id];
-  if (!island) return "";
-  switch (island.restorationSource) {
-    case "hq":
-      return "Grows with the total of your five ranks.";
-    case "skill":
-      return `Restores as ${island.skillIds.map((s) => registry.skillById[s]?.name).join(", ")} ranks up.`;
-    case "scriptTracks":
-      return "Restores with your Craft and Rehearsal tracks.";
-    case "carriers": {
-      const islets = world.islands[id]?.islets ?? [];
-      return `Each stronghold clears as its carrier is charted (${islets.filter((i) => i.level >= 2).length}/${islets.length} charted).`;
-    }
-  }
 }
 
 function usePrefersReducedMotion(): boolean {

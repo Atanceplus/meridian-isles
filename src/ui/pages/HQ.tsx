@@ -6,6 +6,7 @@ import { useApp, useView } from "../app/context";
 import { ConfirmButton } from "../components/Modal";
 import { LineDetails } from "../components/OutcomePanel";
 import { QuickLog } from "../components/QuickLog";
+import { IslandHero } from "../components/IslandArt";
 import { Radar } from "../components/Radar";
 import { SkillSheet } from "../components/SkillSheet";
 import { fmtDateTime, fmtSigned, fmtXp } from "../format";
@@ -19,6 +20,9 @@ export function HQ() {
 
   return (
     <div className="page hq">
+      <div className="hq-hero">
+        <IslandHero islandId="core:island.hq" />
+      </div>
       <section className="panel radar-panel">
         <header className="panel-head">
           <h2>Skill radar</h2>

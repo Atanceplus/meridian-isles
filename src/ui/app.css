@@ -1,59 +1,63 @@
-/* Meridian Isles — Phase 1 interface. The pixel-art world arrives in Phase 4; this is the readable layer around it. */
+/* Meridian Isles interface. Sand is the default theme; dark is opt-in (data-theme="dark" on <html>). */
 
 :root {
   color-scheme: light;
-  --sea: #cfe6e8;
-  --sea-deep: #9ccbd0;
-  --paper: #fbf8f1;
-  --paper-2: #f3eee2;
-  --ink: #1d2730;
-  --muted: #5b6672;
-  --line: #ddd5c4;
+  --sand: #ecdcbc;
+  --sand-deep: #dcc59b;
+  --sand-dot: rgba(122, 92, 52, 0.07);
+  --paper: #fcf7ec;
+  --paper-2: #f5ead4;
+  --ink: #2b2118;
+  --muted: #6e604e;
+  --line: #e0cfae;
   --accent: #127a72;
   --accent-ink: #ffffff;
-  --accent-soft: #d6efec;
+  --accent-soft: #d3ebe4;
   --gold: #b7852b;
   --warn: #9a5b00;
-  --warn-soft: #fff1d6;
+  --warn-soft: #fff0d0;
   --danger: #b3261e;
-  --good: #1f7a3a;
-  --good-soft: #dff3e4;
-  --shadow: 0 1px 0 rgba(29, 39, 48, 0.06), 0 6px 18px rgba(29, 39, 48, 0.08);
+  --good: #2e7a32;
+  --good-soft: #e1f1d8;
+  --shadow: 0 1px 0 rgba(84, 60, 28, 0.08), 0 6px 18px rgba(84, 60, 28, 0.1);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.45;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --sea: #0d1b24;
-    --sea-deep: #12303a;
-    --paper: #17222b;
-    --paper-2: #1d2a34;
-    --ink: #e7ebee;
-    --muted: #9aa8b4;
-    --line: #2b3a46;
-    --accent: #4cc3b6;
-    --accent-ink: #062a27;
-    --accent-soft: #143a39;
-    --gold: #e0b45a;
-    --warn: #f0b45a;
-    --warn-soft: #3a2a10;
-    --danger: #ff8a80;
-    --good: #6fd08b;
-    --good-soft: #163522;
-    --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.3);
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --sand: #14191d;
+  --sand-deep: #1d2a30;
+  --sand-dot: rgba(255, 255, 255, 0.025);
+  --paper: #1b2228;
+  --paper-2: #222b33;
+  --ink: #ece6da;
+  --muted: #a49b8c;
+  --line: #333d46;
+  --accent: #4cc3b6;
+  --accent-ink: #062a27;
+  --accent-soft: #143a39;
+  --gold: #e0b45a;
+  --warn: #f0b45a;
+  --warn-soft: #3a2a10;
+  --danger: #ff8a80;
+  --good: #7fd08b;
+  --good-soft: #163522;
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* Sand: a warm gradient with a faint grain of dots, like a beach seen up close. */
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 50% -200px, var(--sea-deep), transparent), var(--sea);
+  background:
+    radial-gradient(var(--sand-dot) 1px, transparent 1.2px) 0 0 / 7px 7px,
+    radial-gradient(1400px 700px at 50% -260px, var(--sand-deep), transparent),
+    var(--sand);
   color: var(--ink);
   min-height: 100vh;
 }
@@ -1602,4 +1606,107 @@ table.compact th {
   border-radius: 6px;
   padding: 0.5rem;
   font-size: 0.78rem;
+}
+
+/* ---------- Island art: cards and heroes ---------- */
+.island-art {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  line-height: 0;
+  background: #164e63;
+}
+.island-art canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.island-art .island-art-land {
+  position: absolute;
+  inset: 0;
+}
+.island-art.floating .island-art-land {
+  animation: island-bob 4.5s ease-in-out infinite;
+}
+@keyframes island-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.6%);
+  }
+}
+.island-card {
+  padding-top: 0.8rem;
+}
+.island-card-art {
+  display: block;
+  border-radius: 10px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.island-card-art:hover,
+.island-card-art:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(84, 60, 28, 0.22);
+}
+.island-card header .row h2 {
+  margin: 0;
+}
+.island-hero {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+}
+.island-hero .island-art {
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.island-hero-caption {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.hero-steps {
+  display: inline-flex;
+  gap: 3px;
+}
+.hero-steps span {
+  width: 18px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.hero-steps span.on {
+  background: var(--accent);
+}
+.hq-hero {
+  grid-column: 1 / -1;
+}
+.theme-toggle {
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+/* Link-styled buttons shouldn't look like links. */
+a.btn {
+  display: inline-block;
+  text-decoration: none;
+}
+/* Cards show every island in the same frame, letterboxed on the sea. */
+.island-card .island-art {
+  aspect-ratio: 4 / 3;
+}
+.island-card .island-art canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

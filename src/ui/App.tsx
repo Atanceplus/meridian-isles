@@ -12,6 +12,7 @@ import { Inbox } from "./pages/Inbox";
 import { Audit } from "./pages/Audit";
 import { World } from "./pages/World";
 import { href, useRoute, type Route } from "./routes";
+import { getTheme, setTheme, type Theme } from "./theme";
 
 export function App() {
   return (
@@ -35,6 +36,7 @@ function Shell() {
   const { loading, view, instances, currentId, selectInstance, error, clearError } = useApp();
   const route = useRoute();
   const [logging, setLogging] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(getTheme);
   const pending = view?.bundle.submissions.filter((s) => s.status === "pending").length ?? 0;
 
   return (
@@ -66,6 +68,18 @@ function Shell() {
             ))}
           </select>
         )}
+        <button
+          className="icon-btn theme-toggle"
+          onClick={() => {
+            const next = theme === "dark" ? "sand" : "dark";
+            setTheme(next);
+            setThemeState(next);
+          }}
+          aria-label={theme === "dark" ? "Switch to the sand theme" : "Switch to the dark theme"}
+          title={theme === "dark" ? "Sand theme" : "Dark theme"}
+        >
+          {theme === "dark" ? "☀" : "☾"}
+        </button>
         {view && (
           <button className="btn primary" onClick={() => setLogging(true)}>
             + Log activity
